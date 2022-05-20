@@ -296,6 +296,99 @@ OS and is built by Android NDK. This often introduces compatibility issues as
 Android (specifically Termux) is not a standard platform. Do not expect there
 are exist package recipes available out-of-box.
 
+## Commit guidelines
+
+A commit message should look something like:
+```
+<commitType>(<repo>/<package>): (The change made/Short description of the change)
+
+[An optional but **highly recommended** commit message describing the changes made in the commit]
+
+[Fixes https://github.com/termux/termux-packages/issues/<issue number>]
+[Closes https://github.com/termux/termux-packages/pull_requests/<pr number>]
+```
+
+- `<commitType>` describes the type of commit. Types of commits:
+  - `upgpkg`: One or more package(s) was/were updated.
+    Optional extended commit message may include new list of features in the new version, and detailed list of changes in build scripts and/or patches
+  - `dwnpkg`: One or more package(s) was/were downgraded due to build issues or potential bugs
+    commit message should include summary of why the package(s) was/were downgraded. If the summary can't completely describe the reason for downgrade, extended commit message should contain full reason for downgrade.
+  - `enhance`: Enable a feature in a package that was earlier not enabled.
+    Optional (but highly recommended) extended commit message may contain detailed summary of the enabled feature(s) and a basic use case
+  - `chore`: Any housekeeping change or a change which does not affect the user in any way.
+  - `rebuild`: Rebuild a package to link against newer version of shared library
+    Special cases:
+    - When mass rebuilding packages depending on a major package (e.g. openssl), consider using this format:
+      ```
+      rebuild(deps:main/openssl): link against OpenSSL 3.0
+      ```
+  - `scripts`: Any change affecting our build scripts
+
+Examples of good commit messages:
+1. ```
+   upgpkg(main/nodejs): upgrade to v18.2.0
+   ```
+
+2. ```
+   dwnpkg(main/htop): downgrade to v2.2.0
+
+   v3.x needs access to /proc/stat which is now restricted by Android
+   ```
+
+3. ```
+   enhance,upgpkg(nodejs): update to v18.2.0 and use shared libuv
+
+   # Describe the technical reasons of how using shared libuv is beneficial
+   ```
+
+### Special notes for newbies who're just getting started with Open Source
+
+In order to encourage new contributors and help them conteibute to open source, the above mentioned commit requirements should be optionally relaxed. In cases where commit messages need to be changed, the PR may be **Squashed and Merged** or may be merged manually from the command line.
+
+#### Notes for merging PRs from command line
+
+1. It is recommended to use the [GitHub CLI (`gh`)](https://cli.github.com) in order to fetch the contributor's branch.
+   ```sh
+   gh pr checkout <PR Number>
+   ```
+
+2. After checking out the branch, amend the commit message and optionally rebase against the master branch (if necessary).
+
+   When merging manually make sure that you give proper credits for the original patch to it's author by adding a `Co-authored-by: ` line. See https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors for more details. Also add a `Closes #<PR number>`.
+
+   **Note** that the `Closes` and `Co-authored-by` lines are needed only when the PR author has disabled ability for maintainers to push to their branches. If possible, it is recommended to force-push to user's branch and then push the change to master branch since GitHub UI then will detect a merge.
+
+   ```sh
+   git fetch
+   git rebase origin/master
+
+   git commit --amend # Will open up your editor to amend the commit message
+
+   # If possible push to PR author's branch
+   # Note: no need to configure remote branch if you checked
+   # out using GitHub CLI.
+   # git push -f
+   ```
+
+3. Note down the branch name
+   ```sh
+   git branch
+   ```
+
+4. Merge the branch manually
+   ```sh
+   git switch master
+
+   # Note depending upon your git configuration, the default
+   # merge strategy may vary. It is recommended to pass the
+   # merge strategy as a flag to git.
+   git merge <branch name>
+   ```
+
+5. Congratulate the user on sending their (probably) first OSS contribution!
+
+6. Note that sometimes GitHub UI may fail to detect the merge, in such cases make sure that you tell the contributor that their PR was merged manually and they'll recieve their due credits in the repository contribution graph.
+
 ## Basics
 
 Each package is a defined through the `build.sh` script placed into directory
