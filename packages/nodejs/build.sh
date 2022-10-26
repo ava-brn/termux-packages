@@ -70,8 +70,6 @@ termux_step_configure() {
 
 	LDFLAGS+=" -ldl"
 
-	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
-  #    --openssl-no-asm \
 	./configure \
 		--prefix=$TERMUX_PREFIX \
 		--dest-cpu=$DEST_CPU \
@@ -79,6 +77,7 @@ termux_step_configure() {
     --tag=AVA2 \
     --enable-static \
     --partly-static \
+    --openssl-no-asm \
     --with-arm-fpu=neon \
     --with-arm-float-abi=hard \
     --without-intl \
