@@ -45,7 +45,7 @@ jobs:
             ar x ./node*.deb data.tar.xz
             unxz -v data.tar.xz
             tar xvf data.tar
-            cp -rf ./data/data/com.termux/files/usr/bin/node ./node/libnodeexe.so
+            cp -rf ./data/data/com.termux/files/usr/bin/node ./node/node.exe
             ls -al ./node
 
       #            echo "# Copy Node.js runtime deps"
@@ -67,6 +67,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ./_out/node/libnodeexe.so
+            ./_out/node/node.exe
 
 #            ./_out/libs/libs.zip

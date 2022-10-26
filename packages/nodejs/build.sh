@@ -79,9 +79,8 @@ termux_step_configure() {
     --tag=AVA2 \
     --enable-static \
     --partly-static \
-    --openssl-no-asm \
-    --with-arm-fpu=neon
-    --with-arm-float-abi=hard
+    --with-arm-fpu=neon \
+    --with-arm-float-abi=hard \
     --without-intl \
     --without-npm \
     --without-etw \
