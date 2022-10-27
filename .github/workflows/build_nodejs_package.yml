@@ -56,11 +56,14 @@ jobs:
         # poor mans check if the file exists
         run: |
           ls -al ./_out/node/node.exe
+          echo release will be called ${{ github.ref_name }}_${{ matrix.arch }}_${{github.sha}}
           sudo chown -R $(id -u) ./_out
 
       - name: Create Github Release
-        uses: softprops/action-gh-release@v1
+        # help? https://github.com/marketplace/actions/create-release?version=v1.11.1
+        uses: ncipollo/release-action@v1
         with:
+          artifacts: "./_out/node/node.exe"
           name: ${{ github.ref_name }}_${{ matrix.arch }}_${{github.sha}}
-          files: |
-            ./_out/node/node.exe
+          tag: ${{ github.ref_name }}_${{ matrix.arch }}_${{github.sha}}
+          token: ${{ secrets.GITHUB_TOKEN }}
