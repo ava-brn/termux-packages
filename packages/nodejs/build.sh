@@ -78,8 +78,6 @@ termux_step_configure() {
     --enable-static \
     --partly-static \
     --openssl-no-asm \
-    --with-arm-fpu=neon \
-    --with-arm-float-abi=hard \
     --without-intl \
     --without-npm \
     --without-etw \
