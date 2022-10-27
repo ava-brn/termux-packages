@@ -47,26 +47,16 @@ jobs:
             tar xvf data.tar
             cp -rf ./data/data/com.termux/files/usr/bin/node ./node/node.exe
             ls -al ./node
+            env
 
-      #            echo "# Copy Node.js runtime deps"
-      #            cd /home/builder/termux-packages/_out
-      #            cp -rf /data/data/com.termux/files/usr/lib/libssl* ./libs
-      #            cp -rf /data/data/com.termux/files/usr/lib/libcrypt* ./libs
-      #            rm -f ./libs/*.a
-      #            cp -f /data/data/com.termux/files/usr/lib/libc++_shared.so ./libs
-      #            ls -al ./libs
-      #            cd /home/builder/termux-packages/_out/libs
-      #            zip -9 libs *
-      #            ls -al
       - name: Post build
         run: |
           ls -al
           sudo chown -R $(id -u) ./_out
+          exit 1
 
       - name: Create Github Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             ./_out/node/node.exe
-
-#            ./_out/libs/libs.zip
