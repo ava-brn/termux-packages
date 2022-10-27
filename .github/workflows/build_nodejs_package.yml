@@ -53,8 +53,9 @@ jobs:
             env
 
       - name: Post build
+        # poor mans check if the file exists
         run: |
-          ls -al
+          ls -al ./_out/node/node.exe
           sudo chown -R $(id -u) ./_out
 
       - name: Create Github Release
