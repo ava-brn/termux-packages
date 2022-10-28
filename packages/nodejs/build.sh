@@ -74,7 +74,7 @@ termux_step_configure() {
 		--prefix=$TERMUX_PREFIX \
 		--dest-cpu=$DEST_CPU \
 		--dest-os=android \
-    --tag=AVA2 \
+    --tag=AVA3 \
     --enable-static \
     --partly-static \
     --openssl-no-asm \
