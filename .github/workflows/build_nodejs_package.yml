@@ -7,6 +7,9 @@ on:
 
 jobs:
   node-runtime-builder:
+    strategy:
+      matrix:
+        arch: [aarch64, arm, x86_64]
     runs-on: ubuntu-latest
     timeout-minutes: 600
     steps:
@@ -37,7 +40,7 @@ jobs:
             # - arm (arm 32bit)
             # - i686
             # - x86_64
-            ./build-package.sh -a i686 -q openssl nodejs
+            ./build-package.sh -a ${{ matrix.arch }} -q nodejs
 
             echo "# Unpack Node.js & rename"
             cd /home/builder/termux-packages/_out
@@ -45,27 +48,22 @@ jobs:
             ar x ./node*.deb data.tar.xz
             unxz -v data.tar.xz
             tar xvf data.tar
-            cp -rf ./data/data/com.termux/files/usr/bin/node ./node/libnodeexe.so
+            cp -rf ./data/data/com.termux/files/usr/bin/node ./node/node.exe
             ls -al ./node
+            env
 
-            echo "# Copy Node.js runtime deps"
-            cd /home/builder/termux-packages/_out
-            cp -rf /data/data/com.termux/files/usr/lib/libssl* ./libs
-            cp -rf /data/data/com.termux/files/usr/lib/libcrypt* ./libs
-            rm -f ./libs/*.a
-            cp -f /data/data/com.termux/files/usr/lib/libc++_shared.so ./libs
-            ls -al ./libs
-            cd /home/builder/termux-packages/_out/libs
-            zip -9 libs *
-            ls -al
       - name: Post build
+        # poor mans check if the file exists
         run: |
-          ls -al
+          ls -al ./_out/node/node.exe
+          echo release will be called ${{ github.ref_name }}_${{ matrix.arch }}_${{github.sha}}
           sudo chown -R $(id -u) ./_out
 
       - name: Create Github Release
-        uses: softprops/action-gh-release@v1
+        # help? https://github.com/marketplace/actions/create-release?version=v1.11.1
+        uses: ncipollo/release-action@v1
         with:
-          files: |
-            ./_out/node/libnodeexe.so
-            ./_out/libs/libs.zip
+          artifacts: "./_out/node/node.exe"
+          name: ${{ github.ref_name }}_${{ matrix.arch }}_${{github.sha}}
+          tag: ${{ github.ref_name }}_${{ matrix.arch }}_${{github.sha}}
+          token: ${{ secrets.GITHUB_TOKEN }}

@@ -17,6 +17,10 @@ TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
+# local LIBLOG_INCDIR=$TERMUX_PKG_SRCDIR/logging/liblog/include
+#CPPFLAGS+=" -I. -I./include
+#  -I$LIBLOG_INCDIR"
+
 termux_step_post_get_source() {
 	# Prevent caching of host build:
 	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
@@ -65,7 +69,7 @@ termux_step_configure() {
 	export LINK_host=g++
 
 	LDFLAGS+=" -ldl"
-	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
+
 	./configure \
 		--prefix=$TERMUX_PREFIX \
 		--dest-cpu=$DEST_CPU \
@@ -73,10 +77,11 @@ termux_step_configure() {
     --tag=AVA2 \
     --enable-static \
     --partly-static \
-		--shared-openssl \
+    --openssl-no-asm \
     --without-intl \
     --without-npm \
     --without-etw \
+    --without-inspector \
     --without-corepack \
 		--cross-compiling
 
