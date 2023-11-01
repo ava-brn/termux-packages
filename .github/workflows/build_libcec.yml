@@ -1,0 +1,66 @@
+name: Build libcec package
+
+on:
+  push:
+    branches:
+#    tags:
+      - "*"
+
+jobs:
+  node-runtime-builder:
+    strategy:
+      matrix:
+        arch: [aarch64, arm, x86_64]
+    runs-on: ubuntu-latest
+    timeout-minutes: 600
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+
+      - name: Build libcec, package things
+        uses: addnab/docker-run-action@v3
+        with:
+          image: dockitava/package-builder:latest
+          options: -v ${{ github.workspace }}:/home/builder/termux-packages
+          run: |
+            id -u
+            echo "chown madness start.."
+            sudo chown -R $(id -u) /home/builder
+            sudo chown -R $(id -u) /data
+            sudo usermod -u $(id -u) builder
+            sudo groupmod -g $(id -g) builder
+            echo "chown madness done.."
+
+            mkdir -p /home/builder/termux-packages/_out/libcec
+            mkdir -p /home/builder/termux-packages/_out/libs
+
+            echo "# Build packages - this takes a loooong time!"
+            cd /home/builder/termux-packages
+            # build for different architectures:
+            # - aarch64 (arm 64bit)
+            # - arm (arm 32bit)
+            # - i686
+            # - x86_64
+            ./build-package.sh -a ${{ matrix.arch }} -q libcec
+
+            echo "# Unpack libcec & rename"
+            cd /home/builder/termux-packages/_out
+            ls -al
+            cp -f /home/builder/termux-packages/output/* ./
+            env
+
+      - name: Post build
+        # poor mans check if the file exists
+        run: |
+          ls -al ./_out/
+          echo release will be called ${{ github.ref_name }}_${{ matrix.arch }}_${{github.sha}}
+          sudo chown -R $(id -u) ./_out
+
+#      - name: Create Github Release
+#        # help? https://github.com/marketplace/actions/create-release?version=v1.11.1
+#        uses: ncipollo/release-action@v1
+#        with:
+#          artifacts: "./_out/node/node.exe"
+#          name: ${{ github.ref_name }}_${{ matrix.arch }}_${{github.sha}}
+#          tag: ${{ github.ref_name }}_${{ matrix.arch }}_${{github.sha}}
+#          token: ${{ secrets.GITHUB_TOKEN }}
